@@ -189,6 +189,11 @@ export default function BurnWatchDashboard() {
                     type="number"
                     value={tempLimit}
                     onChange={(e) => setTempLimit(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleSaveLimit()
+                      }
+                    }}
                     placeholder="Enter token limit"
                     className="bg-secondary border-border"
                     min={1}
