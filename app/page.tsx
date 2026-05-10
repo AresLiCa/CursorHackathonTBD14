@@ -151,18 +151,16 @@ export default function BurnWatchDashboard() {
               Usage
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent>
             <div className="text-4xl font-bold text-foreground">
               Tokens used:{" "}
               <span className="text-primary">
                 {tokensUsed.toLocaleString()}
               </span>
             </div>
-            {refreshError && (
-              <p className="text-sm font-medium text-destructive">
-                {refreshError}
-              </p>
-            )}
+            <p className="h-0 overflow-visible text-sm font-medium text-destructive">
+              {refreshError ?? ""}
+            </p>
           </CardContent>
         </Card>
 
