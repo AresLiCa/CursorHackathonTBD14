@@ -16,6 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { fetchUsageData } from "@/lib/usage"
 
 export default function BurnWatchDashboard() {
   const [tokensUsed, setTokensUsed] = useState(10)
@@ -24,6 +25,7 @@ export default function BurnWatchDashboard() {
   const [isKilled, setIsKilled] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [refreshError, setRefreshError] = useState<string | null>(null)
 
   const percentage = Math.min((tokensUsed / tokenLimit) * 100, 100)
 
@@ -35,15 +37,21 @@ export default function BurnWatchDashboard() {
 
   const status = getStatus()
 
-  const handleRefresh = useCallback(() => {
+  const handleRefresh = useCallback(async () => {
     if (isKilled) return
+
     setIsRefreshing(true)
-    setTimeout(() => {
-      const newTokens = tokensUsed + Math.floor(Math.random() * 10) + 1
-      setTokensUsed(Math.min(newTokens, tokenLimit))
+    setRefreshError(null)
+
+    try {
+      const data = await fetchUsageData()
+      setTokensUsed(data.usage)
+    } catch {
+      setRefreshError("Could not refresh usage. Please try again.")
+    } finally {
       setIsRefreshing(false)
-    }, 500)
-  }, [isKilled, tokensUsed, tokenLimit])
+    }
+  }, [isKilled])
 
   const handleSaveLimit = () => {
     const newLimit = parseInt(tempLimit, 10)
@@ -92,10 +100,13 @@ export default function BurnWatchDashboard() {
           <CardHeader className="pb-2">
             <CardTitle className="text-lg font-medium text-muted-foreground">Usage</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-2">
             <div className="text-4xl font-bold text-foreground">
               Tokens used: <span className="text-primary">{tokensUsed.toLocaleString()}</span>
             </div>
+            {refreshError && (
+              <p className="text-sm font-medium text-destructive">{refreshError}</p>
+            )}
           </CardContent>
         </Card>
 
